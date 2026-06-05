@@ -14,6 +14,7 @@ An advanced, feature-rich web application designed to optimize engineer profile 
 * **Resume Revision Lab**: Suggests metric-driven alternatives for resume bullet points using the **STAR / XYZ framework** (Action -> Scale -> Impact).
 * **System Architecture Enhancements**: Recommends advanced portfolio improvements to make your projects sound robust for elite engineering teams.
 * **Corporate Interview Blueprint**: Lists high-probability CS topics, target company core technical values, and tailored project talking points.
+* **🗺️ Dynamic Skill Gap Learning Roadmap**: For every identified missing technology, the AI generates an interactive learning roadmap with official documentation links, reference GitHub repositories, and 3 sequential actionable milestones. Users can tick off completed steps and watch their real-time prep progress bar update dynamically.
 * **Evaluation History Log**: Persists and displays previous evaluations, allowing you to load details or remove entries.
 
 ---
