@@ -1,0 +1,47 @@
+# Ignore virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Ignore node modules
+node_modules/
+jspm_packages/
+
+# Ignore builds
+dist/
+build/
+out/
+
+# Ignore environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Ignore local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore IDE configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Ignore OS files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Ignore logs
+*.log
