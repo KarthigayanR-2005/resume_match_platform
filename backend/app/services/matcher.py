@@ -38,23 +38,30 @@ class AnalysisEngineService:
         - missing_critical_skills (list of critical skills from JD missing in resume)
         - bullet_point_refinements (list of suggestions to make work experience bullet points stronger)
         - project_enhancement_suggestions (list of suggested architectural enhancements for their projects)
+        - learning_roadmap (for each missing skill, provide documentation_url, github_repo link for learning, and 3 specific sequential learning steps)
         - company_specific_targeting (culture_and_values_alignment, technical_interview_focus, tailored_project_talking_points)
         
         Do not include markdown wrappers like ```json or ```. Return the raw JSON text directly.
         """
         
-        try:
-            # Utilizing the lightning-fast flash model with strict json output configuration and response schema
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=CompleteAnalysisResponse
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # Utilizing the lightning-fast flash model with strict json output configuration and response schema
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt,
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        response_schema=CompleteAnalysisResponse
+                    )
                 )
-            )
-            return response.text
-            
-        except Exception as e:
-            print(f"[ERROR] Gemini Pipeline Error: {str(e)}")
-            raise e
+                return response.text
+                
+            except Exception as e:
+                print(f"[WARNING] Gemini API attempt {attempt + 1} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    print(f"[ERROR] Gemini Pipeline Error after {max_retries} attempts: {str(e)}")
+                    raise e
+                time.sleep(2)

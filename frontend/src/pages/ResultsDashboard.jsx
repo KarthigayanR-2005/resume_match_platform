@@ -13,13 +13,17 @@ import {
   BrainCircuit, 
   HelpCircle,
   FileCode2,
-  BookmarkCheck
+  BookmarkCheck,
+  Map,
+  CheckSquare,
+  ExternalLink
 } from 'lucide-react';
 import { MatchRing, CategoryBar } from '../components/MetricCharts';
 import SkillBadge from '../components/SkillBadge';
 
 export default function ResultsDashboard({ data, onBack }) {
   const [activeTab, setActiveTab] = useState('match');
+  const [completedSteps, setCompletedSteps] = useState({});
 
   if (!data) return null;
 
@@ -34,6 +38,19 @@ export default function ResultsDashboard({ data, onBack }) {
   const experienceList = data.experience || [];
   const projectsList = data.projects || [];
   const education = data.education || {};
+  const learningRoadmap = data.learning_roadmap || [];
+
+  // Calculate learning progress
+  const totalSteps = learningRoadmap.reduce((acc, item) => acc + (item.learning_steps?.length || 0), 0);
+  const completedStepsCount = Object.values(completedSteps).filter(Boolean).length;
+  const progressPercentage = totalSteps > 0 ? (completedStepsCount / totalSteps) * 100 : 0;
+
+  const toggleStep = (skill, index) => {
+    setCompletedSteps(prev => ({
+      ...prev,
+      [`${skill}-${index}`]: !prev[`${skill}-${index}`]
+    }));
+  };
 
   // Compute category matching percentages for visualization
   const getSkillCategoryStats = () => {
@@ -96,7 +113,8 @@ export default function ResultsDashboard({ data, onBack }) {
           { id: 'match', label: 'Match Diagnostics', icon: <TrendingUp className="w-4 h-4" /> },
           { id: 'refinement', label: 'Resume Revision Lab', icon: <Sparkles className="w-4 h-4" /> },
           { id: 'projects', label: 'Portfolio Upgrades', icon: <FileCode2 className="w-4 h-4" /> },
-          { id: 'interview', label: 'Interview Blueprint', icon: <Compass className="w-4 h-4" /> }
+          { id: 'interview', label: 'Interview Blueprint', icon: <Compass className="w-4 h-4" /> },
+          { id: 'roadmap', label: 'Skill Gap Roadmap', icon: <Map className="w-4 h-4" /> }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -472,6 +490,118 @@ export default function ResultsDashboard({ data, onBack }) {
 
           </div>
 
+        </div>
+      )}
+
+      {/* TAB 5: SKILL GAP ROADMAP */}
+      {activeTab === 'roadmap' && (
+        <div className="space-y-6 animate-fadeIn">
+          
+          {/* OVERALL PROGRESS PANEL */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <Map className="w-4 h-4 text-primary animate-pulse" /> Interactive Technology Learning Roadmap
+                </h3>
+                <p className="text-xs text-slate-450 mt-1 leading-normal">
+                  Track your learning milestones to address skill gaps and update your resume.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 bg-slate-950/60 border border-slate-850 px-4 py-2.5 rounded-xl shrink-0">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Prep Progress:</span>
+                <span className="text-sm font-mono font-extrabold text-primary">{progressPercentage.toFixed(0)}%</span>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="h-3 w-full bg-slate-950/80 rounded-full overflow-hidden border border-slate-850">
+              <div 
+                className="h-full bg-gradient-to-r from-primary via-blue-500 to-teal-400 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          </div>
+
+          {/* ROADMAP ITEMS GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {learningRoadmap.length > 0 ? (
+              learningRoadmap.map((item, idx) => (
+                <div key={idx} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    {/* Header */}
+                    <div className="flex items-center justify-between gap-2 border-b border-slate-850 pb-2.5">
+                      <span className="font-mono font-extrabold text-slate-200 text-xs tracking-wider flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                        {item.skill}
+                      </span>
+                      <span className="text-[9px] font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 px-1.5 py-0.5 rounded">
+                        Missing Gap
+                      </span>
+                    </div>
+
+                    {/* Milestone steps checklist */}
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">Milestone Checkpoints</span>
+                      {item.learning_steps?.map((step, stepIdx) => {
+                        const isDone = !!completedSteps[`${item.skill}-${stepIdx}`];
+                        return (
+                          <div 
+                            key={stepIdx} 
+                            onClick={() => toggleStep(item.skill, stepIdx)}
+                            className={`flex items-start gap-2.5 p-2 rounded-lg border transition-all duration-200 cursor-pointer select-none ${
+                              isDone 
+                                ? 'bg-emerald-500/5 border-emerald-500/20 text-slate-400 line-through' 
+                                : 'bg-slate-950/40 border-slate-850 hover:border-slate-800 text-slate-300'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                              isDone ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-700'
+                            }`}>
+                              {isDone && <CheckSquare className="w-3.5 h-3.5" />}
+                            </div>
+                            <span className="text-[11px] leading-relaxed">{step}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Resource buttons */}
+                  <div className="flex gap-3 pt-3 border-t border-slate-850/60 mt-4">
+                    {item.documentation_url && (
+                      <a 
+                        href={item.documentation_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 flex-1 py-2 text-[10px] font-bold rounded-lg bg-slate-950 border border-slate-850 hover:border-primary/30 hover:bg-slate-950 hover:text-primary transition-all"
+                      >
+                        <ExternalLink className="w-3 h-3" /> Official Docs
+                      </a>
+                    )}
+                    {item.github_repo && (
+                      <a 
+                        href={item.github_repo} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 flex-1 py-2 text-[10px] font-bold rounded-lg bg-slate-950 border border-slate-850 hover:border-emerald-500/30 hover:bg-slate-950 hover:text-emerald-400 transition-all"
+                      >
+                        Reference Code
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-2 text-center py-16 bg-slate-900 border border-slate-800 rounded-2xl">
+                <HelpCircle className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                <h3 className="text-xs font-bold text-slate-400">Perfect Match Alignment!</h3>
+                <p className="text-[10px] text-slate-650 max-w-xs mx-auto mt-1 leading-relaxed">
+                  No technology gaps were detected between your resume and this job description. Your skills perfectly line up!
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

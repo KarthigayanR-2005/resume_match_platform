@@ -69,6 +69,12 @@ class CompanyTargetingAnalysis(BaseModel):
     technical_interview_focus: TechnicalInterviewFocus
     tailored_project_talking_points: List[ProjectPitchAngle]
 
+class SkillRoadmapItem(BaseModel):
+    skill: str = Field(..., description="The name of the missing skill")
+    documentation_url: str = Field(..., description="Link to official documentation or top tutorial")
+    github_repo: str = Field(..., description="Relevant GitHub repository for code examples or starter project")
+    learning_steps: List[str] = Field(..., description="3 actionable, sequential steps to master this skill and add it to your resume")
+
 # ==========================================
 # 4. MASTER COMPREHENSIVE OUTPUT SCHEMA
 # ==========================================
@@ -88,5 +94,6 @@ class CompleteAnalysisResponse(BaseModel):
     missing_critical_skills: List[str] = Field(..., description="Crucial technologies or keywords missing based on the JD")
     bullet_point_refinements: List[BulletPointRefinement]
     project_enhancement_suggestions: List[ProjectEnhancement]
+    learning_roadmap: List[SkillRoadmapItem] = Field(default=[], description="Actionable roadmap for each missing critical technology")
     
     company_specific_targeting: CompanyTargetingAnalysis
